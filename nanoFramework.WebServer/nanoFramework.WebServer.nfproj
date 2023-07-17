@@ -37,6 +37,8 @@
     <Compile Include="CallbackRoutes.cs" />
     <Compile Include="CaseSensitiveAttribute.cs" />
     <Compile Include="HttpProtocol.cs" />
+    <Compile Include="Results\BaseResult.cs" />
+    <Compile Include="Results\OkResult.cs" />
     <Compile Include="WebServerEventArgs.cs" />
     <Compile Include="Header.cs" />
     <Compile Include="MethodAttribute.cs" />
@@ -93,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.lock.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\CarControl.nanoFramework.Json\nanoFramework.Json\nanoFramework.Json.nfproj" />
   </ItemGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>

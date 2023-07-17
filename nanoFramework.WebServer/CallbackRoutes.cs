@@ -22,6 +22,8 @@ namespace nanoFramework.WebServer
         /// </summary>
         public string Route { get; set; }
 
+        public ParameterInfo[] Parameters { get; set; }
+
         /// <summary>
         /// Is the root case sensitive?
         /// </summary>

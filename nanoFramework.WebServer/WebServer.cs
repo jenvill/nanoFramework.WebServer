@@ -2,13 +2,18 @@
 // Copyright (c) 2020 Laurent Ellerbach and the project contributors
 // See LICENSE file in the project root for full license information.
 //
+#nullable enable
 
+using nanoFramework.Json;
+using nanoFramework.WebServer.Results;
 using System;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Security;
+using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -96,7 +101,7 @@ namespace nanoFramework.WebServer
         #region Param
 
         /// <summary>
-        /// Get an array of parameters from a URL
+        /// Get an array of parameterInfos from a URL
         /// </summary>
         /// <param name="parameter"></param>
         /// <returns></returns>
@@ -208,6 +213,7 @@ namespace nanoFramework.WebServer
                                 callbackRoutes.CaseSensitive = false;
                                 callbackRoutes.Method = string.Empty;
                                 callbackRoutes.Authentication = authentication;
+                                callbackRoutes.Parameters = func.GetParameters();
 
                                 callbackRoutes.Callback = func;
                                 foreach (var otherattrib in attributes)
@@ -328,10 +334,10 @@ namespace nanoFramework.WebServer
         /// <summary>
         /// Delegate for the CommandReceived event.
         /// </summary>
-        public delegate void GetRequestHandler(object obj, WebServerEventArgs e);
+        public delegate BaseResult? GetRequestHandler(object obj);
 
         /// <summary>
-        /// CommandReceived event is triggered when a valid command (plus parameters) is received.
+        /// CommandReceived event is triggered when a valid command (plus parameterInfos) is received.
         /// Valid commands are defined in the AllowedCommands property.
         /// </summary>
         public event GetRequestHandler CommandReceived;
@@ -545,9 +551,9 @@ namespace nanoFramework.WebServer
                         // Matching the route name
                         // Matching the method type
                         if (!isFound ||
-                            (toCompare.IndexOf(routeStr) != incForSlash) ||
-                            (route.Method != string.Empty && context.Request.HttpMethod != route.Method)
-                            )
+                          (toCompare.IndexOf(routeStr) != incForSlash) ||
+                          (route.Method != string.Empty && context.Request.HttpMethod != route.Method.ToUpper())
+                          )
                         {
                             continue;
                         }
@@ -582,7 +588,43 @@ namespace nanoFramework.WebServer
 
                         if (isAuthOk)
                         {
-                            InvokeRoute(route, context);
+                            var controller = CreateController(route, context);
+                                                    
+                            var parameters = new object[route.Parameters.Length];
+
+                            for (int i = 0; i < route.Parameters.Length; i++)
+                            {
+                                ParameterInfo? parameterInfo = route.Parameters[i];
+                                if (parameterInfo.ParameterType == typeof(UrlParameter[]))
+                                {
+                                    parameters[i] = DecodeParam(rawUrl);
+                                }
+                                else if (parameterInfo.ParameterType == typeof(string))
+                                {
+                                    var buffer = new byte[context.Request.ContentLength64];
+                                    context.Request.InputStream.Read(buffer, 0, buffer.Length);
+                                    parameters[i] = new string(Encoding.UTF8.GetChars(buffer));
+                                }
+                                else
+                                {
+                                    var buffer = new byte[context.Request.ContentLength64];
+                                    context.Request.InputStream.Read(buffer, 0, buffer.Length);
+                                    var json = new string(Encoding.UTF8.GetChars(buffer));
+                                    parameters[i] = JsonConvert.DeserializeObject(json, parameterInfo.ParameterType);
+                                }
+                            }
+
+                            if (route.Parameters.Length == 0) parameters = null;
+
+                            var result = route.Callback.Invoke(controller, parameters) as BaseResult;
+
+                            if (result != null && context.Response != null)
+                            {
+                                context.Response.StatusCode = result.StatusCode;
+                                context.Response.ContentLength64 = result.Content.Length;
+                                context.Response.ContentType = "text/plain";
+                                OutPutStream(context.Response, result.Content);
+                            }
                         }
                         else
                         {
@@ -607,12 +649,22 @@ namespace nanoFramework.WebServer
                         }
                     }
 
+                    if (context.Response == null) return;
+
                     if (!isRoute)
                     {
                         if (CommandReceived != null)
                         {
                             // Starting a new thread to be able to handle a new request in parallel
-                            CommandReceived.Invoke(this, new WebServerEventArgs(context));
+                            var result = CommandReceived.Invoke(this) ?? throw new Exception("CommandReceived event must return a WebRequest result");
+
+                            if (result != null)
+                            {
+                                context.Response.StatusCode = result.StatusCode;
+                                context.Response.ContentLength64 = result.Content.Length;
+                                context.Response.ContentType = "text/plain";
+                                OutPutStream(context.Response, result.Content);
+                            }
                         }
                         else
                         {
@@ -643,12 +695,9 @@ namespace nanoFramework.WebServer
         /// <summary>
         /// Method which invokes route. Can be overriden to inject custom logic.
         /// </summary>
-        /// <param name="route">Current rounte to invoke. Resolved based on parameters.</param>
+        /// <param name="route">Current rounte to invoke. Resolved based on parameterInfos.</param>
         /// <param name="context">Context of current request.</param>
-        protected virtual void InvokeRoute(CallbackRoutes route, HttpListenerContext context)
-        {
-            route.Callback.Invoke(null, new object[] { new WebServerEventArgs(context) });
-        }
+        protected virtual object? CreateController(CallbackRoutes route, HttpListenerContext context) => null;
 
         private string GetApiKeyFromHeaders(WebHeaderCollection headers)
         {
