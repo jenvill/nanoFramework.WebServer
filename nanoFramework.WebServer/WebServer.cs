@@ -2,7 +2,7 @@
 // Copyright (c) 2020 Laurent Ellerbach and the project contributors
 // See LICENSE file in the project root for full license information.
 //
-#nullable enable
+//#nullable enable
 
 using nanoFramework.Json;
 using nanoFramework.WebServer.Results;
@@ -610,7 +610,9 @@ namespace nanoFramework.WebServer
                                     var buffer = new byte[context.Request.ContentLength64];
                                     context.Request.InputStream.Read(buffer, 0, buffer.Length);
                                     var json = new string(Encoding.UTF8.GetChars(buffer));
+                                    Console.WriteLine($"WebServer json: {json}");
                                     parameters[i] = JsonConvert.DeserializeObject(json, parameterInfo.ParameterType);
+                                    Console.WriteLine($"WebServer object: {parameters[i]}");
                                 }
                             }
 
@@ -632,7 +634,6 @@ namespace nanoFramework.WebServer
                             {
                                 context.Response.Headers.Add("WWW-Authenticate", $"Basic realm=\"Access to {routeStr}\"");
                             }
-
                             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                             context.Response.ContentLength64 = 0;
                         }

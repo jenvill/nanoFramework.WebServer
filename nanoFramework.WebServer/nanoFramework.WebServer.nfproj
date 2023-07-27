@@ -51,6 +51,12 @@
     <None Include="key.snk" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="mscorlib">
+      <HintPath>..\packages\nanoFramework.CoreLibrary.1.14.2\lib\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="nanoFramework.Json">
+      <HintPath>..\packages\nanoFramework.Json.2.2.99\lib\nanoFramework.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nanoFramework.Runtime.Events, Version=1.11.6.0, Culture=neutral, PublicKeyToken=c07d481e9758c731">
       <HintPath>..\packages\nanoFramework.Runtime.Events.1.11.6\lib\nanoFramework.Runtime.Events.dll</HintPath>
       <Private>True</Private>
@@ -93,10 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.lock.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\CarControl.nanoFramework.CoreLibrary\nanoFramework.CoreLibrary\CoreLibrary.nfproj" />
-    <ProjectReference Include="..\..\CarControl.nanoFramework.Json\nanoFramework.Json\nanoFramework.Json.nfproj" />
   </ItemGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>
