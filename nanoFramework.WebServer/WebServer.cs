@@ -2,7 +2,7 @@
 // Copyright (c) 2020 Laurent Ellerbach and the project contributors
 // See LICENSE file in the project root for full license information.
 //
-//#nullable enable
+//
 
 using nanoFramework.Json;
 using nanoFramework.WebServer.Results;
