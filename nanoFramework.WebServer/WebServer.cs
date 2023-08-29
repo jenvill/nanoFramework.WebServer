@@ -594,7 +594,7 @@ namespace nanoFramework.WebServer
 
                             for (int i = 0; i < route.Parameters.Length; i++)
                             {
-                                ParameterInfo? parameterInfo = route.Parameters[i];
+                                ParameterInfo parameterInfo = route.Parameters[i];
                                 if (parameterInfo.ParameterType == typeof(UrlParameter[]))
                                 {
                                     parameters[i] = DecodeParam(rawUrl);
