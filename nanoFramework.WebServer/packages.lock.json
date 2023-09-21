@@ -40,9 +40,9 @@
       },
       "nanoFramework.System.Net.Http.Server": {
         "type": "Direct",
-        "requested": "[1.5.84, 1.5.84]",
-        "resolved": "1.5.84",
-        "contentHash": "WAMF37CvmDkSH+VZ2mHeBNX2vwX3Gf64L6d2UDRTWLg4HiznkV7+vyIYQg2m2AlFvREndZYsezSnpkubYXoN7w=="
+        "requested": "[1.5.99, 1.5.99]",
+        "resolved": "1.5.99",
+        "contentHash": "yMjiZ952xSYC1lZhGW+TH2qKZ/usmBU2R1OxNtx1pQ/bHkst4jEbXbvfuA4WMdbbx8fvybJPlDu4FtyGfRipwg=="
       },
       "nanoFramework.System.Text": {
         "type": "Direct",
@@ -67,12 +67,6 @@
         "requested": "[1.14.24, 1.14.24]",
         "resolved": "1.14.24",
         "contentHash": "dApgYplMFRUTp7izZxvduXgl9B7oqVPqqagkYXFf6cRJRC3Og0y2JZTVJdhGPW/ud0U0+rvjqXOU+1CtEzv88A=="
-      },
-      "Nerdbank.GitVersioning": {
-        "type": "Direct",
-        "requested": "[3.6.133, 3.6.133]",
-        "resolved": "3.6.133",
-        "contentHash": "VZWMd5YAeDxpjWjAP/X6bAxnRMiEf6tES/ITN0X5CHJgkWLLeHGmEALivmTAfYM6P+P/3Szy6VCITUAkqjcHVw=="
       }
     }
   }
