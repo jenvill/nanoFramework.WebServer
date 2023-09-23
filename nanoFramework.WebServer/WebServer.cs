@@ -610,9 +610,7 @@ namespace nanoFramework.WebServer
                                     var buffer = new byte[context.Request.ContentLength64];
                                     context.Request.InputStream.Read(buffer, 0, buffer.Length);
                                     var json = new string(Encoding.UTF8.GetChars(buffer));
-                                    Console.WriteLine($"WebServer json: {json}");
                                     parameters[i] = JsonConvert.DeserializeObject(json, parameterInfo.ParameterType);
-                                    Console.WriteLine($"WebServer object: {parameters[i]}");
                                 }
                             }
 
